@@ -4,6 +4,7 @@ import sys
 import re
 from time import sleep
 from urllib.request import urlopen
+from urllib.error import URLError
 import argparse
 from os import path
 
@@ -26,19 +27,14 @@ def check_balance(address):
         print( "\nThis Bitcoin Address is invalid" + check_address )
         exit(1)
 
-    #Read info from Blockchain about the Address
-    reading_state=1
-    while (reading_state):
-        try:
-            htmlfile = urlopen("https://blockchain.info/address/%s?format=json" % check_address, timeout = 10)
-            htmltext = htmlfile.read().decode('utf-8')
-            reading_state  = 0
-        except:
-            reading_state+=1
-            print( "Checking... " + str(reading_state) )
-            sleep(60*reading_state)
-
     print( "\nBitcoin Address = " + check_address )
+
+    try:
+        htmlfile = urlopen("https://blockchain.info/address/{}?format=json".format(check_address), timeout = 10)
+        htmltext = htmlfile.read().decode('utf-8')
+    except URLError as e:
+        print("Request failed. Reason: {}".format(e.reason))
+        return
 
     blockchain_info_array = []
     tag = ''
