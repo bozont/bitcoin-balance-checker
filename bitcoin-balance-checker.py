@@ -4,6 +4,8 @@ import sys
 import re
 from time import sleep
 from urllib.request import urlopen
+import argparse
+from os import path
 
 
 def check_balance(address):
@@ -58,11 +60,24 @@ def check_balance(address):
 
 
 def main():
-    with open("list-addresses.txt") as file:
-        for line in file:
-            address = str.strip(line)
-            print("__________________________________________________\n")
-            check_balance(address)
+    argparser = argparse.ArgumentParser(description='BTC wallet balance checker')
+    argparser.add_argument('wallet_address_or_file',
+                       metavar='wallet_address_or_file',
+                       type=str,
+                       help='Wallet address or path to a text file with wallet addresses')
+
+    args = argparser.parse_args()
+    addr_or_file = args.wallet_address_or_file
+
+    if path.exists(addr_or_file):
+        with open("list-addresses.txt") as file:
+            for line in file:
+                address = str.strip(line)
+                print("__________________________________________________\n")
+                check_balance(address)
+
+    else:
+        check_balance(addr_or_file)
 
 
 if __name__ == "__main__":
